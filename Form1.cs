@@ -11,6 +11,7 @@ using GMap.NET.WindowsForms.Markers;
 using System.Data;
 using System.Data.SqlClient;
 
+
 namespace MapTechnique
 {
     public partial class Form1 : Form
@@ -58,12 +59,14 @@ namespace MapTechnique
        
 
         private void btnCreateDb_Click(object sender, EventArgs e)
-        {   
-            using (var   myConn =
-                   new SqlConnection(ConfigurationManager.ConnectionStrings["GMarkersStr"].ConnectionString))
+        {
+            var conStr = ConfigurationManager.ConnectionStrings["GMarkers"].ConnectionString;
+
+            using (var myConn =
+                   new SqlConnection(conStr))
             {
-                 
-               var str = "CREATE DATABASE GMarkers";
+
+                var str = "";
 
 
                 using (SqlCommand myCommand = new SqlCommand(str, myConn))
