@@ -1,0 +1,12 @@
+﻿IF DB_ID('GMarkers') IS NULL
+	CREATE DATABASE GMarkers;
+	USE GMarkers;
+	CREATE TABLE Markers 
+	(	MarkerID int ,
+		MarkerText NVARCHAR(106),
+		MarkerLat float,
+		MarkerLon float,
+
+	)
+	
+	

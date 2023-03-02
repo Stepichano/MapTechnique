@@ -28,13 +28,79 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
+            this.button2 = new System.Windows.Forms.Button();
+            this.button3 = new System.Windows.Forms.Button();
+            this.btnCreateDb = new System.Windows.Forms.Button();
+            this.gMapControl1 = new GMap.NET.WindowsForms.GMapControl();
             this.SuspendLayout();
+            // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(947, 72);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(80, 42);
+            this.button2.TabIndex = 2;
+            this.button2.Text = "MarkersOff/On";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.CreateMarker_Click);
+            // 
+            // button3
+            // 
+            this.button3.Location = new System.Drawing.Point(947, 150);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(80, 42);
+            this.button3.TabIndex = 3;
+            this.button3.Text = "Owerlays";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.Owerlay_Click);
+            // 
+            // btnCreateDb
+            // 
+            this.btnCreateDb.Location = new System.Drawing.Point(947, 198);
+            this.btnCreateDb.Name = "btnCreateDb";
+            this.btnCreateDb.Size = new System.Drawing.Size(71, 48);
+            this.btnCreateDb.TabIndex = 4;
+            this.btnCreateDb.Text = "CreateDb";
+            this.btnCreateDb.UseVisualStyleBackColor = true;
+            this.btnCreateDb.Click += new System.EventHandler(this.btnCreateDb_Click);
+            // 
+            // gMapControl1
+            // 
+            this.gMapControl1.Bearing = 0F;
+            this.gMapControl1.CanDragMap = true;
+            this.gMapControl1.EmptyTileColor = System.Drawing.Color.Navy;
+            this.gMapControl1.GrayScaleMode = false;
+            this.gMapControl1.HelperLineOption = GMap.NET.WindowsForms.HelperLineOptions.DontShow;
+            this.gMapControl1.LevelsKeepInMemory = 5;
+            this.gMapControl1.Location = new System.Drawing.Point(12, 24);
+            this.gMapControl1.MarkersEnabled = true;
+            this.gMapControl1.MaxZoom = 2;
+            this.gMapControl1.MinZoom = 2;
+            this.gMapControl1.MouseWheelZoomEnabled = true;
+            this.gMapControl1.MouseWheelZoomType = GMap.NET.MouseWheelZoomType.MousePositionAndCenter;
+            this.gMapControl1.Name = "gMapControl1";
+            this.gMapControl1.NegativeMode = false;
+            this.gMapControl1.PolygonsEnabled = true;
+            this.gMapControl1.RetryLoadTile = 0;
+            this.gMapControl1.RoutesEnabled = true;
+            this.gMapControl1.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
+            this.gMapControl1.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
+            this.gMapControl1.ShowTileGridLines = false;
+            this.gMapControl1.Size = new System.Drawing.Size(872, 729);
+            this.gMapControl1.TabIndex = 6;
+            this.gMapControl1.Zoom = 0D;
+            this.gMapControl1.Load += new System.EventHandler(this.gMapControl1_Load_1);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(1162, 806);
+            this.Controls.Add(this.gMapControl1);
+            this.Controls.Add(this.btnCreateDb);
+            this.Controls.Add(this.button3);
+            this.Controls.Add(this.button2);
             this.Name = "Form1";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);
@@ -43,6 +109,12 @@
         }
 
         #endregion
+
+        private System.ComponentModel.BackgroundWorker backgroundWorker1;
+        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button btnCreateDb;
+        private GMap.NET.WindowsForms.GMapControl gMapControl1;
     }
 }
 
