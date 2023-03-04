@@ -10,6 +10,9 @@ using GMap.NET.MapProviders;
 using GMap.NET.WindowsForms.Markers;
 using System.Data;
 using System.Data.SqlClient;
+using System.Drawing;
+using System.IO;
+using System.Xml.Linq;
 
 
 namespace MapTechnique
@@ -25,11 +28,45 @@ namespace MapTechnique
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            _uss.Add(new Us("Новосибирск", new Coordinates(82.9346, 82.9346)));
+            this.BackColor = Color.FromArgb(43, 43, 43);
+            ///
+            /// Form1
+            ///
+            this.StartPosition = FormStartPosition.WindowsDefaultBounds;
+            ///
+            /// menuStrip1
+            ///
+            menuStrip1.BackColor = this.BackColor;
+            menuStrip1.ShowItemToolTips = true;
+            ///
+            /// fileToolStripMenuItem
+            ///  
+            fileToolStripMenuItem.BackColor = menuStrip1.BackColor;
+            foreach (ToolStripItem dropDownItem in fileToolStripMenuItem.DropDownItems)
+            {
+                dropDownItem.BackColor = menuStrip1.BackColor;
+            }
+            ///
+            /// helpToolStripMenuItem
+            ///
+            helpToolStripMenuItem.BackColor = menuStrip1.BackColor;
+            foreach (ToolStripItem dropDownItem in helpToolStripMenuItem.DropDownItems)
+            {
+                dropDownItem.BackColor =  menuStrip1.BackColor;
+            }
+            ///
+            /// Gmap
+            /// 
             GMapProvider.WebProxy = WebRequest.GetSystemWebProxy();
             GMapProvider.WebProxy.Credentials = CredentialCache.DefaultCredentials;
-
+            _uss.Add(new Us("Новосибирск", new Coordinates(82.9346, 82.9346)));
+            ///
+            /// Database
+            ///
+            CreateDatabase(); 
+            CreateAndPopulateTable();
         }
+
         private void gMapControl1_Load_1(object sender, EventArgs e)
         {
             GMap.NET.GMaps.Instance.Mode = GMap.NET.AccessMode.ServerOnly; //выбор подгрузки карты – онлайн или из ресурсов
@@ -45,53 +82,100 @@ namespace MapTechnique
             gMapControl1.ShowTileGridLines = false; //показывать или скрывать тайлы
         }
 
-        private void CreateMarker_Click(object sender, EventArgs e)
+        private static void CreateDatabase()
         {
-            gMapControl1.Overlays.Add(GMarker.GetOverlayMarkers(_uss, "GroupMarkers", GMarkerGoogleType.red));
-            gMapControl1.Update();
-        }
-
-        private void Owerlay_Click(object sender, EventArgs e)
-        {
-            gMapControl1.Overlays[0].IsVisibile = true;
-        }
-
-       
-
-        private void btnCreateDb_Click(object sender, EventArgs e)
-        {
-            var conStr = ConfigurationManager.ConnectionStrings["GMarkers"].ConnectionString;
-
-            using (var myConn =
-                   new SqlConnection(conStr))
+            using (var connection = new SqlConnection(ConfigurationManager.ConnectionStrings["MyServerConnection"].ConnectionString))
             {
 
-                var str = "";
+                var databaseName = "MyDataBase";
+
+                var dataFilePath =
+                    $@"C:\Program Files\Microsoft SQL Server\MSSQL15.MSSQLSERVER\MSSQL\Data\{databaseName}.mdf";
+
+                var logFilePath =
+                    $@"C:\Program Files\Microsoft SQL Server\MSSQL15.MSSQLSERVER\MSSQL\Data\{databaseName}_log.ldf";
+
+                var createDbQuery2 = $"CREATE DATABASE {databaseName}";
+                    // $"ON (NAME = {databaseName}, FILENAME = '{dataFilePath}') LOG ON (NAME = '{databaseName}_log', FILENAME = '{logFilePath}')";
 
 
-                using (SqlCommand myCommand = new SqlCommand(str, myConn))
+                using (var createDbCommand = new SqlCommand(createDbQuery2, connection))
                 {
                     try
                     {
-                        myConn.Open();
-                        myCommand.ExecuteNonQuery();
-                        MessageBox.Show("DataBase is Created Successfully", "MyProgram", MessageBoxButtons.OK,
-                            MessageBoxIcon.Information);
+                        connection.Open();
+
+                        createDbCommand.ExecuteNonQuery();
+
                     }
-                    catch (System.Exception ex)
+                    /*catch (Exception ex)
                     {
-                        MessageBox.Show(ex.ToString(), "MyProgram", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
+                    //    MessageBox.Show($"{ex.Message}");
+                    }*/
                     finally
                     {
-                        if (myConn.State == ConnectionState.Open)
-                        {
-                            myConn.Close();
-                        }
+                        connection.Close();
+                    }
+                }
+            }
+
+        }
+
+        private static void CreateAndPopulateTable()
+        {
+            using (var connection = new SqlConnection(ConfigurationManager.ConnectionStrings["MyDatabaseConnection"].ConnectionString))
+            {
+
+                // Создание таблицы
+                var createTableQuery = "CREATE TABLE Users (Id int PRIMARY KEY, Name nvarchar(50), Age int)";
+
+                // Заполнение таблицы данными
+                var insertDataQuery =
+                    "INSERT INTO Users (Id, Name, Age) VALUES (1, 'John', 25), (2, 'Jane', 30), (3, 'Bob', 40)";
+
+                using (var createTableCommand = new SqlCommand(createTableQuery, connection))
+                {
+                    try
+                    {
+                        connection.Open();
+
+                        var insertDataCommand = new SqlCommand(insertDataQuery, connection);
+
+                    }
+                    /*catch (Exception ex)
+                    {
+                        MessageBox.Show($"{ex.Message}");
+                    }*/
+                    finally
+                    {
+                        connection.Close();
                     }
                 }
             }
         }
 
+        private void btnCreateMarker_Click(object sender, EventArgs e)
+        {
+            var formCreateMarkers = new FormCreateMarkers();
+            formCreateMarkers.ShowDialog();
+        }
+
+        private void btnMarkersOnOFf_Click(object sender, EventArgs e)
+        {
+            gMapControl1.Overlays.Add(GMarker.GetOverlayMarkers(_uss, "GroupMarkers", GMarkerGoogleType.red));
+            gMapControl1.Update();
+        }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private void saveToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+       
     }
 }
