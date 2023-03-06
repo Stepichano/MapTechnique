@@ -37,7 +37,6 @@ namespace MapTechnique
             ///
             this.BackColor = Color.FromArgb(43, 43, 43);
             this.StartPosition = FormStartPosition.WindowsDefaultBounds;
-
             ///
             /// menuStrip1
             ///
@@ -52,17 +51,9 @@ namespace MapTechnique
                 dropDownItem.BackColor = menuStrip1.BackColor;
             }
             ///
-            /// helpToolStripMenuItem
-            ///
-            helpToolStripMenuItem.BackColor = menuStrip1.BackColor;
-            foreach (ToolStripItem dropDownItem in helpToolStripMenuItem.DropDownItems)
-            {
-                dropDownItem.BackColor =  menuStrip1.BackColor;
-            }
-            ///
             /// Database
             ///
-            SqlConnectionExtensions.CreateDatabase();
+            SqlConnectionExtensions.CreateDatabase(); // If DataBase dos not exist, will be created
             ///
             /// gMapControl1
             /// 
@@ -70,6 +61,12 @@ namespace MapTechnique
             gMapControl1.Overlays.Add(GMarker.Get_GMapOverlayGMarkers(gMarkers, "GroupMarkers", GMarkerGoogleType.red)); //create an overlay
             gMapControl1.Overlays[0].IsVisibile = false; //make the overlay invisible
             gMapControl1.Update();
+            ///
+            /// btns close, collapse, reextarnal
+            ///
+            btnClose.Image = Properties.Resources.close;
+            btnReExtarnal.Image = Properties.Resources.reexternal;
+            btnCollapse.Image = Properties.Resources.collapse;
         }
 
         private void gMapControl1_Load_1(object sender, EventArgs e)
@@ -88,7 +85,7 @@ namespace MapTechnique
             // pinned to the edges of its containing element
             // controls (of the main form) and their sizes change
             // respectively.
-            gMapControl1.Dock = DockStyle.Fill; 
+            //gMapControl1.Dock = DockStyle.Fill; 
             gMapControl1.ShowCenter = false; //show or hide the red cross in the center
             gMapControl1.ShowTileGridLines = false; //show or hide tiles
             // Events
@@ -140,7 +137,9 @@ namespace MapTechnique
             _selectedMarker = gMapControl1.Overlays
                 .SelectMany(o => o.Markers)
                 .FirstOrDefault(m => m.IsMouseOver == true);
+            
         }
+
 
         private void gMapControl1_MouseUp(object sender, MouseEventArgs e)
         {
@@ -151,9 +150,49 @@ namespace MapTechnique
             var latlng = gMapControl1.FromLocalToLatLng(e.X, e.Y);
             // Assign a new position for the marker.
             _selectedMarker.Position = latlng;
+            foreach (var gMarker in gMarkers)
+            {
+                if (_selectedMarker.ToolTipText == gMarker.Name)
+                {
+                    gMarker.Position = _selectedMarker.Position;
+                    gMarker.IsMarkerMoved = true;
+                }
+            }
             // deselect marker.
             _selectedMarker = null;
 
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (MessageBox.Show("Вы действительно хотите выйти из приложения?", "Выход", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+                // Save the changed coordinates.
+                SqlConnectionExtensions.UpdateDataIntoDb(gMarkers);
+            }
+            else
+            {
+                e.Cancel = true; // отменить закрытие формы
+            }
+        }
+
+        private void btnReExtarnal_Click(object sender, EventArgs e)
+        {
+            if (this.WindowState == FormWindowState.Maximized)
+            {
+                this.WindowState = FormWindowState.Normal;
+            }
+            else
+            {
+                this.WindowState = FormWindowState.Maximized;
+            }
+
+
+        }
+
+        private void btnCollapse_Click(object sender, EventArgs e)
+        {
+            this.WindowState = FormWindowState.Minimized;
         }
     }
 }

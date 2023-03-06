@@ -12,6 +12,9 @@ using System.Reflection.Metadata;
 using System.Security.RightsManagement;
 using JetBrains.Annotations;
 using System.Globalization;
+using GMap.NET;
+using GMap.NET.MapProviders;
+using GMap.NET.WindowsForms;
 
 namespace MapTechnique
 {
@@ -128,7 +131,7 @@ namespace MapTechnique
         /// <param name="name"></param>
         /// <param name="coordinates"></param>
         /// <returns>record Id</returns>
-        public static int InsertMarkerDataIntoDb(string name, Coordinates coordinates)
+        public static int InsertMarkerDataIntoDb(string name, PointLatLng coordinates)
         {   
             // In this variable, save the ID of the inserted record. 
             var id = -1;
@@ -152,8 +155,8 @@ namespace MapTechnique
                         command.Transaction = transaction;
 
                         command.Parameters.AddWithValue("@name", $"{name}");
-                        command.Parameters.AddWithValue("@lat", coordinates.Latitude);
-                        command.Parameters.AddWithValue("@lng", coordinates.Longitude);
+                        command.Parameters.AddWithValue("@lat", coordinates.Lat);
+                        command.Parameters.AddWithValue("@lng", coordinates.Lng);
 
                         id = Convert.ToInt32(command.ExecuteScalar());
                         // ending transaction
@@ -255,11 +258,13 @@ namespace MapTechnique
                         dataReader = command.ExecuteReader();
 
                         while (dataReader.Read())
-                        {
-                            var gMarker = new GMarker(Convert.ToInt32(dataReader["ID"]), 
-                                Convert.ToString(dataReader["Name"]), 
-                                new Coordinates(Convert.ToSingle(dataReader["Latitude"], CultureInfo.InvariantCulture.NumberFormat),
-                                Convert.ToSingle(dataReader["Longitude"], CultureInfo.InvariantCulture.NumberFormat)));
+                        {   
+                            var gMarker = new GMarker(new PointLatLng(Convert.ToDouble(dataReader["Latitude"], CultureInfo.InvariantCulture.NumberFormat), Convert.ToDouble(dataReader["Longitude"], CultureInfo.InvariantCulture.NumberFormat)))
+                            {
+                                Id = Convert.ToInt32(dataReader["ID"]),
+                                Name = Convert.ToString(dataReader["Name"]),
+
+                            };
                             gMarkers.Add(gMarker);
                         }
                     }
@@ -279,8 +284,49 @@ namespace MapTechnique
                 }
             }
         }
-        
 
-        public static void 
+        /// <summary>
+        /// The function writes changes to the database from the list.
+        /// </summary>
+        /// <param name="gMarkers"></param>
+        public static void UpdateDataIntoDb(List<GMarker> gMarkers)
+        {
+            using (var connection =
+                   new SqlConnection(ConfigurationManager.ConnectionStrings["MyDatabase"].ConnectionString))
+            {
+                try
+                {
+                    connection.Open();
+
+
+                    foreach (var gMarker in gMarkers)
+                    {
+                        if (gMarker.IsMarkerMoved == true)
+                        {
+                            var commandText = "UPDATE [dbo].[Markers]" +
+                                              $" SET Latitude = {gMarker.Position.Lat.ToString(CultureInfo.InvariantCulture)}," +
+                                              $" Longitude = {gMarker.Position.Lng.ToString(CultureInfo.InvariantCulture)} " +
+                                              $"WHERE ID = {gMarker.Id};" 
+                                              ;
+                            using (var command = new SqlCommand(commandText, connection))
+                            {
+                                command.ExecuteNonQuery();
+                            }
+                        }
+                    }
+                    
+                }
+                catch (Exception ex)
+                {
+
+                    MessageBox.Show(ex.Message);
+                }
+                finally
+                {
+                    connection.Close();
+                }
+                
+            }
+        }
     }
 }

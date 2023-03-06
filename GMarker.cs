@@ -4,29 +4,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Avalonia.Media;
+using GMap.NET;
 using GMap.NET.WindowsForms;
 using GMap.NET.WindowsForms.Markers;
 
 namespace MapTechnique
 {
-    public class GMarker 
+    public class GMarker : GMapMarker
     {
         public bool IsMarkerMoved = false;
         public int Id { get; set; }
         public string Name { get; set; }
-        public Coordinates Coordinates { get; set; }
-        
 
-        public GMarker(int id, string name, Coordinates coordinates)
+        public GMarker(PointLatLng pos) : base(pos)
         {
-            Id = id;
-            Name = name;
-            Coordinates = coordinates;
-        }
-        public GMarker(string name, Coordinates coordinates)
-        {
-            Name = name;
-            Coordinates = coordinates;
+
         }
 
         /// <summary>
@@ -37,7 +29,7 @@ namespace MapTechnique
         /// <returns>GMarkerGoogle</returns>
         public static GMarkerGoogle GetMarker(GMarker gMarker, GMarkerGoogleType gMarkerGoogleType = GMarkerGoogleType.red)
         {   
-            var mapMarker = new GMarkerGoogle(new GMap.NET.PointLatLng(gMarker.Coordinates.Latitude, gMarker.Coordinates.Longitude), gMarkerGoogleType);//широта, долгота, тип маркера
+            var mapMarker = new GMarkerGoogle(gMarker.Position, gMarkerGoogleType);//позиция, тип маркера
             mapMarker.ToolTip = new GMap.NET.WindowsForms.ToolTips.GMapRoundedToolTip(mapMarker); //marker info popup
             mapMarker.ToolTipText = gMarker.Name; //text inside the popup
             mapMarker.ToolTipMode = MarkerTooltipMode.OnMouseOver; //popup display (on hover)

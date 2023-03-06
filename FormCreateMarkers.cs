@@ -34,22 +34,6 @@ namespace MapTechnique
 
         }
 
-
-        private void gMapControl1_Load(object sender, EventArgs e)
-        {
-            
-            // settings
-            GMapProvider.WebProxy = WebRequest.GetSystemWebProxy();
-            GMapProvider.WebProxy.Credentials = CredentialCache.DefaultCredentials;
-            GMap.NET.GMaps.Instance.Mode = GMap.NET.AccessMode.ServerOnly;
-            gMapControl1.MapProvider = GMap.NET.MapProviders.GoogleMapProvider.Instance;
-            gMapControl1.MinZoom = 2;
-            gMapControl1.MaxZoom = 16;
-            gMapControl1.Zoom = 4;
-            gMapControl1.DragButton = MouseButtons.Left;
-            gMapControl1.ShowCenter = false;
-        }
-
         private void textBoxMarkerLat_Validated(object sender, EventArgs e)
         {
             var textBox = sender as TextBox;
@@ -74,6 +58,12 @@ namespace MapTechnique
             }
         }
 
+        /// <summary>
+        /// This function is called to validate the latitude input.
+        /// </summary>
+        /// <param name="latitude"></param>
+        /// <param name="errorMessage"></param>
+        /// <returns>True if the data is being validated otherwise false</returns>
         public bool ValidLatValue(string latitude, out string errorMessage)
         {   
             errorMessage = "";
@@ -126,6 +116,12 @@ namespace MapTechnique
             }
         }
 
+        /// <summary>
+        /// This function is called to validate the longitude input.
+        /// </summary>
+        /// <param name="longitude"></param>
+        /// <param name="errorMessage"></param>
+        /// <returns>True if the data is being validated otherwise false </returns>
         public bool ValidLngValue(string longitude, out string errorMessage)
         {
             errorMessage = "";
@@ -166,15 +162,17 @@ namespace MapTechnique
                 MessageBox.Show("Please fill in the empty fields");
             else
             {   // We create a marker and enter it into the database, and also pass it to form1.
-                gmarkerBuffer = new GMarker(textBoxMarkerName.Text,
-                    new Coordinates(Convert.ToSingle(textBoxMarkerLat.Text, CultureInfo.InvariantCulture.NumberFormat), Convert.ToSingle(textBoxMarkerLng.Text, CultureInfo.InvariantCulture.NumberFormat)));
-                gmarkerBuffer.Id = SqlConnectionExtensions.InsertMarkerDataIntoDb(gmarkerBuffer.Name, gmarkerBuffer.Coordinates);
+                gmarkerBuffer = new GMarker(new PointLatLng(Convert.ToSingle(textBoxMarkerLat.Text, CultureInfo.InvariantCulture.NumberFormat), Convert.ToSingle(textBoxMarkerLng.Text, CultureInfo.InvariantCulture.NumberFormat)))
+                {
+                    Name = textBoxMarkerName.Text, 
+                };
+                gmarkerBuffer.Id =
+                    SqlConnectionExtensions.InsertMarkerDataIntoDb(gmarkerBuffer.Name, gmarkerBuffer.Position);
 
                 this.DialogResult = DialogResult.OK;
             }
 
         }
-
         private void btnCancel_Click(object sender, EventArgs e)
         {
             this.Close();
