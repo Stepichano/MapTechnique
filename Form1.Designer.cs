@@ -47,7 +47,6 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.btnCreateMarker = new System.Windows.Forms.Button();
             this.btnMarkersOnOFf = new System.Windows.Forms.Button();
-            this.button5 = new System.Windows.Forms.Button();
             this.btnClose = new System.Windows.Forms.Button();
             this.btnReExtarnal = new System.Windows.Forms.Button();
             this.btnCollapse = new System.Windows.Forms.Button();
@@ -198,7 +197,6 @@
             // 
             this.panel1.Controls.Add(this.btnCreateMarker);
             this.panel1.Controls.Add(this.btnMarkersOnOFf);
-            this.panel1.Controls.Add(this.button5);
             this.panel1.Location = new System.Drawing.Point(1193, 86);
             this.panel1.Margin = new System.Windows.Forms.Padding(25, 0, 0, 0);
             this.panel1.Name = "panel1";
@@ -234,19 +232,6 @@
             this.btnMarkersOnOFf.UseVisualStyleBackColor = true;
             this.btnMarkersOnOFf.Click += new System.EventHandler(this.btnMarkersOnOFf_Click);
             // 
-            // button5
-            // 
-            this.button5.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.button5.Location = new System.Drawing.Point(100, 395);
-            this.button5.Margin = new System.Windows.Forms.Padding(50, 25, 50, 0);
-            this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(166, 81);
-            this.button5.TabIndex = 10;
-            this.button5.Text = "Owerlays";
-            this.button5.UseVisualStyleBackColor = true;
-            // 
             // btnClose
             // 
             this.btnClose.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
@@ -257,6 +242,7 @@
             this.btnClose.Size = new System.Drawing.Size(39, 33);
             this.btnClose.TabIndex = 9;
             this.btnClose.UseVisualStyleBackColor = true;
+            this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
             // 
             // btnReExtarnal
             // 
@@ -312,7 +298,6 @@
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Button btnCreateMarker;
         private System.Windows.Forms.Button btnMarkersOnOFf;
-        private System.Windows.Forms.Button button5;
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem contentsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem indexToolStripMenuItem;

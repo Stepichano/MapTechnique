@@ -8,12 +8,12 @@ namespace MapTechnique
 {
     public class Coordinates
     {
-        public double Lat { get; set; }
-        public double Lon { get; set; }
-        public Coordinates(double lat, double lon)
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
+        public Coordinates(double latitude, double longitude)
         {
-            Lat = lat;
-            Lon = lon;
+            Latitude = latitude;
+            Longitude = longitude;
         }
     }
 }

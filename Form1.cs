@@ -8,18 +8,22 @@ using System.Windows.Forms;
 using GMap.NET.Avalonia;
 using GMap.NET.MapProviders;
 using GMap.NET.WindowsForms.Markers;
-using System.Data;
-using System.Data.SqlClient;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Xml.Linq;
+using Tmds.DBus;
+using GMapMarker = GMap.NET.WindowsForms.GMapMarker;
 
 
 namespace MapTechnique
 {
     public partial class Form1 : Form
     {   
-        private List<Us> _uss = new List<Us>();
+        public List<GMarker> gMarkers = new List<GMarker>();
+
+        private GMapMarker _selectedMarker;
+        public GMapMarker AddGMapMarker { get; set; }
 
         public Form1()
         {
@@ -28,11 +32,12 @@ namespace MapTechnique
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            this.BackColor = Color.FromArgb(43, 43, 43);
             ///
             /// Form1
             ///
+            this.BackColor = Color.FromArgb(43, 43, 43);
             this.StartPosition = FormStartPosition.WindowsDefaultBounds;
+
             ///
             /// menuStrip1
             ///
@@ -55,115 +60,63 @@ namespace MapTechnique
                 dropDownItem.BackColor =  menuStrip1.BackColor;
             }
             ///
-            /// Gmap
-            /// 
-            GMapProvider.WebProxy = WebRequest.GetSystemWebProxy();
-            GMapProvider.WebProxy.Credentials = CredentialCache.DefaultCredentials;
-            _uss.Add(new Us("Новосибирск", new Coordinates(82.9346, 82.9346)));
-            ///
             /// Database
             ///
-            CreateDatabase(); 
-            CreateAndPopulateTable();
+            SqlConnectionExtensions.CreateDatabase();
+            ///
+            /// gMapControl1
+            /// 
+            SqlConnectionExtensions.MarkerDataSelectionQuery(gMarkers);
+            gMapControl1.Overlays.Add(GMarker.Get_GMapOverlayGMarkers(gMarkers, "GroupMarkers", GMarkerGoogleType.red)); //create an overlay
+            gMapControl1.Overlays[0].IsVisibile = false; //make the overlay invisible
+            gMapControl1.Update();
         }
 
         private void gMapControl1_Load_1(object sender, EventArgs e)
         {
-            GMap.NET.GMaps.Instance.Mode = GMap.NET.AccessMode.ServerOnly; //выбор подгрузки карты – онлайн или из ресурсов
-            gMapControl1.MapProvider = GMap.NET.MapProviders.GoogleMapProvider.Instance; //какой провайдер карт используется (в нашем случае гугл) 
-            gMapControl1.MinZoom = 2; //минимальный зум
-            gMapControl1.MaxZoom = 16; //максимальный зум
-            gMapControl1.Zoom = 4; // какой используется зум при открытии
-            gMapControl1.Position = new GMap.NET.PointLatLng(66.4169575018027, 94.25025752215694);// точка в центре карты при открытии (центр России)
-            gMapControl1.MouseWheelZoomType = GMap.NET.MouseWheelZoomType.MousePositionAndCenter; // как приближает (просто в центр карты или по положению мыши)
+            // settings
+            GMapProvider.WebProxy = WebRequest.GetSystemWebProxy();
+            GMapProvider.WebProxy.Credentials = CredentialCache.DefaultCredentials;
+            GMap.NET.GMaps.Instance.Mode = GMap.NET.AccessMode.ServerOnly; //set the mode of loading maps only from online resources
+            gMapControl1.MapProvider = GMap.NET.MapProviders.GoogleMapProvider.Instance; //which map provider is used (in our case, Google) 
+            gMapControl1.MinZoom = 2; //minimum zoom
+            gMapControl1.MaxZoom = 16; //maximum zoom
+            gMapControl1.Zoom = 6; //what zoom is used when opening
+            gMapControl1.MouseWheelZoomType = GMap.NET.MouseWheelZoomType.MousePositionAndCenter; //how it zooms in (just to the center of the map or by mouse position)
+            gMapControl1.Position = new GMap.NET.PointLatLng(55.0415, 82.9346); //initial position of the map
+            // Specify that all edges of the control
+            // pinned to the edges of its containing element
+            // controls (of the main form) and their sizes change
+            // respectively.
+            gMapControl1.Dock = DockStyle.Fill; 
+            gMapControl1.ShowCenter = false; //show or hide the red cross in the center
+            gMapControl1.ShowTileGridLines = false; //show or hide tiles
+            // Events
             gMapControl1.CanDragMap = true; // перетаскивание карты мышью
-            gMapControl1.DragButton = MouseButtons.Left; // какой кнопкой осуществляется перетаскивание
-            gMapControl1.ShowCenter = false; //показывать или скрывать красный крестик в центре
-            gMapControl1.ShowTileGridLines = false; //показывать или скрывать тайлы
-        }
+            gMapControl1.DragButton = MouseButtons.Left; // какой кнопкой осуществляется перетаскивание.
+            gMapControl1.MouseDown += gMapControl1_MouseDown;
+            gMapControl1.MouseUp += gMapControl1_MouseUp;
 
-        private static void CreateDatabase()
-        {
-            using (var connection = new SqlConnection(ConfigurationManager.ConnectionStrings["MyServerConnection"].ConnectionString))
-            {
-
-                var databaseName = "MyDataBase";
-
-                var dataFilePath =
-                    $@"C:\Program Files\Microsoft SQL Server\MSSQL15.MSSQLSERVER\MSSQL\Data\{databaseName}.mdf";
-
-                var logFilePath =
-                    $@"C:\Program Files\Microsoft SQL Server\MSSQL15.MSSQLSERVER\MSSQL\Data\{databaseName}_log.ldf";
-
-                var createDbQuery2 = $"CREATE DATABASE {databaseName}";
-                    // $"ON (NAME = {databaseName}, FILENAME = '{dataFilePath}') LOG ON (NAME = '{databaseName}_log', FILENAME = '{logFilePath}')";
-
-
-                using (var createDbCommand = new SqlCommand(createDbQuery2, connection))
-                {
-                    try
-                    {
-                        connection.Open();
-
-                        createDbCommand.ExecuteNonQuery();
-
-                    }
-                    /*catch (Exception ex)
-                    {
-                    //    MessageBox.Show($"{ex.Message}");
-                    }*/
-                    finally
-                    {
-                        connection.Close();
-                    }
-                }
-            }
-
-        }
-
-        private static void CreateAndPopulateTable()
-        {
-            using (var connection = new SqlConnection(ConfigurationManager.ConnectionStrings["MyDatabaseConnection"].ConnectionString))
-            {
-
-                // Создание таблицы
-                var createTableQuery = "CREATE TABLE Users (Id int PRIMARY KEY, Name nvarchar(50), Age int)";
-
-                // Заполнение таблицы данными
-                var insertDataQuery =
-                    "INSERT INTO Users (Id, Name, Age) VALUES (1, 'John', 25), (2, 'Jane', 30), (3, 'Bob', 40)";
-
-                using (var createTableCommand = new SqlCommand(createTableQuery, connection))
-                {
-                    try
-                    {
-                        connection.Open();
-
-                        var insertDataCommand = new SqlCommand(insertDataQuery, connection);
-
-                    }
-                    /*catch (Exception ex)
-                    {
-                        MessageBox.Show($"{ex.Message}");
-                    }*/
-                    finally
-                    {
-                        connection.Close();
-                    }
-                }
-            }
         }
 
         private void btnCreateMarker_Click(object sender, EventArgs e)
         {
+            // Create a new marker constructor form.
             var formCreateMarkers = new FormCreateMarkers();
             formCreateMarkers.ShowDialog();
+
+            // If the add button was clicked, handle this event. 
+            if (formCreateMarkers.DialogResult == DialogResult.OK)
+            {
+                gMapControl1.Overlays[0].Markers.Add(GMarker.GetMarker(formCreateMarkers.gmarkerBuffer));
+            }
+
         }
 
         private void btnMarkersOnOFf_Click(object sender, EventArgs e)
         {
-            gMapControl1.Overlays.Add(GMarker.GetOverlayMarkers(_uss, "GroupMarkers", GMarkerGoogleType.red));
-            gMapControl1.Update();
+            // Onn/Off markers.
+            gMapControl1.Overlays[0].IsVisibile = !gMapControl1.Overlays[0].IsVisibile;
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -176,6 +129,31 @@ namespace MapTechnique
 
         }
 
-       
+        private void btnClose_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private void gMapControl1_MouseDown(object sender, MouseEventArgs e)
+        {
+            // Find the marker over which the mouse button was pressed.
+            _selectedMarker = gMapControl1.Overlays
+                .SelectMany(o => o.Markers)
+                .FirstOrDefault(m => m.IsMouseOver == true);
+        }
+
+        private void gMapControl1_MouseUp(object sender, MouseEventArgs e)
+        {
+            if(_selectedMarker is null)
+                return;
+
+            // transfer mouse cursor coordinates to longitude and latitude on the map.
+            var latlng = gMapControl1.FromLocalToLatLng(e.X, e.Y);
+            // Assign a new position for the marker.
+            _selectedMarker.Position = latlng;
+            // deselect marker.
+            _selectedMarker = null;
+
+        }
     }
 }

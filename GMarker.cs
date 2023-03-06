@@ -3,47 +3,63 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Avalonia.Media;
 using GMap.NET.WindowsForms;
 using GMap.NET.WindowsForms.Markers;
 
 namespace MapTechnique
 {
     public class GMarker 
-    {   
+    {
+        public bool IsMarkerMoved = false;
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public Coordinates Coordinates { get; set; }
+        
+
+        public GMarker(int id, string name, Coordinates coordinates)
+        {
+            Id = id;
+            Name = name;
+            Coordinates = coordinates;
+        }
+        public GMarker(string name, Coordinates coordinates)
+        {
+            Name = name;
+            Coordinates = coordinates;
+        }
+
         /// <summary>
-        /// Функция создающая маркер на основе объкта us.
+        /// A function that creates a marker based on a GMarker object.
         /// </summary>
-        /// <param name="us"></param>
+        /// <param name="gMarkeraram>
         /// <param name="gMarkerGoogleType"></param>
         /// <returns>GMarkerGoogle</returns>
-        public static GMarkerGoogle GetMarker(Us us, GMarkerGoogleType gMarkerGoogleType = GMarkerGoogleType.red)
+        public static GMarkerGoogle GetMarker(GMarker gMarker, GMarkerGoogleType gMarkerGoogleType = GMarkerGoogleType.red)
         {   
-            
-            var mapMarker = new GMarkerGoogle(new GMap.NET.PointLatLng(us.Coordinates.Lat, us.Coordinates.Lon), gMarkerGoogleType);//широта, долгота, тип маркера
-            mapMarker.ToolTip = new GMap.NET.WindowsForms.ToolTips.GMapRoundedToolTip(mapMarker);//всплывающее окно с инфой к маркеру
-            mapMarker.ToolTipText = us.Id; // текст внутри всплывающего окна
-            mapMarker.ToolTipMode = MarkerTooltipMode.OnMouseOver; //отображение всплывающего окна (при наведении)
+            var mapMarker = new GMarkerGoogle(new GMap.NET.PointLatLng(gMarker.Coordinates.Latitude, gMarker.Coordinates.Longitude), gMarkerGoogleType);//широта, долгота, тип маркера
+            mapMarker.ToolTip = new GMap.NET.WindowsForms.ToolTips.GMapRoundedToolTip(mapMarker); //marker info popup
+            mapMarker.ToolTipText = gMarker.Name; //text inside the popup
+            mapMarker.ToolTipMode = MarkerTooltipMode.OnMouseOver; //popup display (on hover)
             return mapMarker;
         }
-
         /// <summary>
-        /// Эта функция создает холст с маркерами.
-        /// Принимает список объектов us, затем создает маркеры на его основе
-        /// и добавляет их на холст.
+        /// This function creates a canvas with markers.
+        /// Takes a list of gMarker objects, then creates markers based on it
+        /// and adds them to the canvas.
         /// </summary>
-        /// <param name="uss"></param>
+        /// <param name="gMarkers"></param>
         /// <param name="name"></param>
         /// <param name="gMarkerGoogleType"></param>
-        /// <returns>GetOverlayMarkers</returns>
-        public static GMapOverlay GetOverlayMarkers(List<Us> uss, string name, GMarkerGoogleType gMarkerGoogleType = GMarkerGoogleType.red)
+        /// <returns>GMapOverlay</returns>
+        public static GMapOverlay Get_GMapOverlayGMarkers(List<GMarker> gMarkers, string name, GMarkerGoogleType gMarkerGoogleType = GMarkerGoogleType.red)
         {
-            var gMapMarkers = new GMapOverlay(name);// создание именованного слоя 
-            foreach (var us in uss)
+            var gMapOverlayGmarkers = new GMapOverlay(name); //create new overlay
+            foreach (var gMarker in gMarkers)
             {
-                gMapMarkers.Markers.Add(GetMarker(us, gMarkerGoogleType));// добавление маркеров на слой
+                gMapOverlayGmarkers.Markers.Add(GetMarker(gMarker, gMarkerGoogleType)); //adding markers to the overlay
             }
-            return gMapMarkers;
+            return gMapOverlayGmarkers;
         }
-
     }
 }

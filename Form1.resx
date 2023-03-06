@@ -222,15 +222,12 @@
   <data name="btnCollapse.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAACcAAAAnCAYAAACMo1E1AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
-        wQAADsEBuJFr7QAAAR1JREFUWEftkz1qhEAYhv3ZmYhgIWTdtIpYBBFrSZsmB/EGadJ4ghzAK3gAW+uA
+        vgAADr4B6kKxwAAAAR1JREFUWEftkz1qhEAYhv3ZmYhgIWTdtIpYBBFrSZsmB/EGadJ4ghzAK3gAW+uA
         TcA27AH2AmE3G/N94gSLXdYUpljeBx6+l3H8ZvwZDQAAAAAAXCd1Xd80TWO1bSu6rpN935tVVQ1SNlRl
         ad5KXVO5LEvBmeVeNCZZ7sVjdJ8+LjWfe8JxnDfTNA+GYXyNcmb3Z5xeV3mq6vPbTwixc133mZact0l+
         Gtu23yl+/5NHz/MeqV4mz/NbKkfyVKNFlFK+UL0M/yuWZX1QPNloCelLPVGdRxRFD/Q/bCnyG1zCYVO6
         rn/Sxl7/fDCKolilabpOksSbGobhmg2CYMhc4zje0Bm648pzeOycaq7v+5ssy5xxOQAAAAAAcJVo2g/f
         xt3HAlL/MwAAAABJRU5ErkJggg==
 </value>
-  </data>
-  <data name="Form1_CreateDatabase__0_" xml:space="preserve">
-      <value>{0}</value>
   </data>
 </root>
