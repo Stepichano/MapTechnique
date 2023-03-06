@@ -116,15 +116,6 @@ namespace MapTechnique
             gMapControl1.Overlays[0].IsVisibile = !gMapControl1.Overlays[0].IsVisibile;
         }
 
-        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Application.Exit();
-        }
-
-        private void saveToolStripMenuItem1_Click(object sender, EventArgs e)
-        {
-
-        }
 
         private void btnClose_Click(object sender, EventArgs e)
         {
@@ -193,6 +184,16 @@ namespace MapTechnique
         private void btnCollapse_Click(object sender, EventArgs e)
         {
             this.WindowState = FormWindowState.Minimized;
+        }
+
+        private void exitToolStripMenuItem2_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private void saveToolStripMenuItem2_Click(object sender, EventArgs e)
+        {
+            SqlConnectionExtensions.UpdateDataIntoDb(gMarkers);
         }
     }
 }
