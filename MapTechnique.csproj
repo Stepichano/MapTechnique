@@ -320,7 +320,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <None Include="SqlSripts\StartQuety.sqlscript" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

@@ -29,7 +29,7 @@ namespace MapTechnique
 
             if (!DatabaseExists(databaseName))
             {
-                
+
                 using (var connection =
                        new SqlConnection(ConfigurationManager.ConnectionStrings["MyServerConnection"].ConnectionString))
                 {
@@ -132,7 +132,7 @@ namespace MapTechnique
         /// <param name="coordinates"></param>
         /// <returns>record Id</returns>
         public static int InsertMarkerDataIntoDb(string name, PointLatLng coordinates)
-        {   
+        {
             // In this variable, save the ID of the inserted record. 
             var id = -1;
 
@@ -147,11 +147,11 @@ namespace MapTechnique
                 using (var command = new SqlCommand(commandText, connection))
                 {
                     try
-                    {   
+                    {
                         connection.Open();
                         // create transaction and started
                         var transaction = connection.BeginTransaction();
-                        
+
                         command.Transaction = transaction;
 
                         command.Parameters.AddWithValue("@name", $"{name}");
@@ -246,19 +246,19 @@ namespace MapTechnique
                    new SqlConnection(ConfigurationManager.ConnectionStrings["MyDatabase"].ConnectionString))
             {
                 var commandText = "SELECT ID, Name, Latitude, Longitude FROM [dbo].[Markers] ";
-                
-                SqlDataReader dataReader = null; 
-                    
+
+                SqlDataReader dataReader = null;
+
                 using (var command = new SqlCommand(commandText, connection))
                 {
                     try
-                    {   
+                    {
                         connection.Open();
 
                         dataReader = command.ExecuteReader();
 
                         while (dataReader.Read())
-                        {   
+                        {
                             var gMarker = new GMarker(new PointLatLng(Convert.ToDouble(dataReader["Latitude"], CultureInfo.InvariantCulture.NumberFormat), Convert.ToDouble(dataReader["Longitude"], CultureInfo.InvariantCulture.NumberFormat)))
                             {
                                 Id = Convert.ToInt32(dataReader["ID"]),
@@ -273,7 +273,7 @@ namespace MapTechnique
                         MessageBox.Show(ex.Message);
                     }
                     finally
-                    {   
+                    {
                         if (dataReader != null && !dataReader.IsClosed)
                         {
                             dataReader.Close();
@@ -306,7 +306,7 @@ namespace MapTechnique
                             var commandText = "UPDATE [dbo].[Markers]" +
                                               $" SET Latitude = {gMarker.Position.Lat.ToString(CultureInfo.InvariantCulture)}," +
                                               $" Longitude = {gMarker.Position.Lng.ToString(CultureInfo.InvariantCulture)} " +
-                                              $"WHERE ID = {gMarker.Id};" 
+                                              $"WHERE ID = {gMarker.Id};"
                                               ;
                             using (var command = new SqlCommand(commandText, connection))
                             {
@@ -314,7 +314,7 @@ namespace MapTechnique
                             }
                         }
                     }
-                    
+
                 }
                 catch (Exception ex)
                 {
@@ -325,7 +325,7 @@ namespace MapTechnique
                 {
                     connection.Close();
                 }
-                
+
             }
         }
     }

@@ -19,7 +19,7 @@ using GMapMarker = GMap.NET.WindowsForms.GMapMarker;
 namespace MapTechnique
 {
     public partial class Form1 : Form
-    {   
+    {
         public List<GMarker> gMarkers = new List<GMarker>();
 
         private GMapMarker _selectedMarker;
@@ -110,6 +110,7 @@ namespace MapTechnique
 
         }
 
+
         private void btnMarkersOnOFf_Click(object sender, EventArgs e)
         {
             // Onn/Off markers.
@@ -128,13 +129,13 @@ namespace MapTechnique
             _selectedMarker = gMapControl1.Overlays
                 .SelectMany(o => o.Markers)
                 .FirstOrDefault(m => m.IsMouseOver == true);
-            
+
         }
 
 
         private void gMapControl1_MouseUp(object sender, MouseEventArgs e)
         {
-            if(_selectedMarker is null)
+            if (_selectedMarker is null)
                 return;
 
             // transfer mouse cursor coordinates to longitude and latitude on the map.
